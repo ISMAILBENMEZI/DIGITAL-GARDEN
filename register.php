@@ -60,12 +60,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
             $user_id = mysqli_insert_id($conn);
 
             $_SESSION['success'] = "Account created successfully";
+            $_SESSION['userId'] = $user_id;
             $_SESSION['username'] = $name;
             $_SESSION['login_time'] = time();
+
+            $stm->close();
+            header("location: dashboard.php");
+            exit;
+        } else {
+            $stm->close();
+            $message[] = "Registration failed. Please try again.";
         }
-        $stm->close();
-        header("location: dashboard.php");
-        exit;
     }
 }
 

@@ -44,15 +44,26 @@
 
         <?php elseif ($page === 'dashboard'): ?>
             <div class="flex space-x-4">
+                <div class="flex items-center justify-center gap-3">
+                    <h4 class="text-2xl font-semibold text-white" style="text-transform: uppercase;">
+                        Hello <?= htmlspecialchars($_SESSION['username']) ?>
+                    </h4>
+
+                    <img src="IMG/user_8801434.png"
+                        alt="Profile"
+                        class="w-9 h-9 rounded-full border border-white object-cover">
+                </div>
+
                 <a href="index.php"
                     class="px-4 py-2 rounded-md bg-white text-green-600 font-semibold hover:bg-green-100 transition">
                     Accueil
                 </a>
 
-                <a href="logout.php"
+                <a href="includes/auth.php"
                     class="px-4 py-2 rounded-md border border-white hover:bg-white hover:text-green-600 transition">
                     Log out
                 </a>
+
             </div>
         <?php endif; ?>
     </nav>
