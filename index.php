@@ -1,4 +1,3 @@
-<?php include "config/database.php"; ?>
 <!doctype html>
 <html>
 
@@ -9,7 +8,10 @@
 </head>
 
 <body>
-  <?php require_once "includes/header.php" ?>
+  <?php
+  $page = "index";
+  require_once "includes/header.php";
+  ?>
   <main class="index_main">
     <div class="modal">
       <div class="modal_log">

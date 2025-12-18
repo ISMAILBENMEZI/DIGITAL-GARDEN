@@ -5,16 +5,55 @@
             Digital Garden
         </h2>
 
-        <div class="flex space-x-4">
-            <a href="register.php"
-                class="px-4 py-2 rounded-md border border-white hover:bg-white hover:text-green-600 transition">
-                Create Account
-            </a>
+        <?php if ($page === 'index'): ?>
+            <div class="flex space-x-4">
+                <a href="register.php"
+                    class="px-4 py-2 rounded-md border border-white hover:bg-white hover:text-green-600 transition">
+                    Create Account
+                </a>
 
-            <a href="login.php"
-                class="px-4 py-2 rounded-md bg-white text-green-600 font-semibold hover:bg-green-100 transition">
-                Login
-            </a>
-        </div>
+                <a href="login.php"
+                    class="px-4 py-2 rounded-md bg-white text-green-600 font-semibold hover:bg-green-100 transition">
+                    Login
+                </a>
+            </div>
+        <?php elseif ($page === 'register'): ?>
+            <div class="flex space-x-4">
+                <a href="index.php"
+                    class="px-4 py-2 rounded-md border border-white hover:bg-white hover:text-green-600 transition">
+                    Accueil
+                </a>
+
+                <a href="login.php"
+                    class="px-4 py-2 rounded-md bg-white text-green-600 font-semibold hover:bg-green-100 transition">
+                    Login
+                </a>
+            </div>
+        <?php elseif ($page === 'login'): ?>
+            <div class="flex space-x-4">
+                <a href="register.php"
+                    class="px-4 py-2 rounded-md border border-white hover:bg-white hover:text-green-600 transition">
+                    Create Account
+                </a>
+
+                <a href="index.php"
+                    class="px-4 py-2 rounded-md bg-white text-green-600 font-semibold hover:bg-green-100 transition">
+                    Accueil
+                </a>
+            </div>
+
+        <?php elseif ($page === 'dashboard'): ?>
+            <div class="flex space-x-4">
+                <a href="index.php"
+                    class="px-4 py-2 rounded-md bg-white text-green-600 font-semibold hover:bg-green-100 transition">
+                    Accueil
+                </a>
+
+                <a href="logout.php"
+                    class="px-4 py-2 rounded-md border border-white hover:bg-white hover:text-green-600 transition">
+                    Log out
+                </a>
+            </div>
+        <?php endif; ?>
     </nav>
 </header>

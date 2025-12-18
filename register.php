@@ -1,7 +1,10 @@
 <?php include "config/database.php";
-$message = [];
-$goodmessage = [];
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['createAccount'])) {
+
+    $message = [];
+
     $name = trim($_POST['userName']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
@@ -30,20 +33,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif ($password !== $confirm) {
         $message[] = "Passwords do not match";
     }
-}
 
-if (empty($message)) {
-    $hashPassword = password_hash($password, PASSWORD_DEFAULT);
-    $registrationDate = date("Y-m-d H:i:s");
-    $stm = $conn->prepare("INSERT INTO utilisateur(name , email,registration_date,password) VALUES(?,?,?,?)");
-    $stm->bind_param("ssss", $name, $email, $registrationDate, $hashPassword);
 
-    if ($stm->execute()) {
-        $goodmessage[] = "Account created successfully!";
+    $stm = $conn->prepare("SELECT id FROM utilisateur WHERE email = ?");
+    $stm->bind_param("s", $email);
+    $stm->execute();
+
+    $result = $stm->get_result();
+
+    if ($result->num_rows > 0) {
+        $message[] =  "This email is already registered";
+        $_SESSION['error'] = "This email is already registered";
+        header("location: login.php");
+        exit;
     }
 
     $stm->close();
+
+    if (empty($message)) {
+        $hashPassword = password_hash($password, PASSWORD_DEFAULT);
+        $registrationDate = date("Y-m-d H:i:s");
+        $stm = $conn->prepare("INSERT INTO utilisateur(name , email,registration_date,password) VALUES(?,?,?,?)");
+        $stm->bind_param("ssss", $name, $email, $registrationDate, $hashPassword);
+
+        if ($stm->execute()) {
+            $user_id = mysqli_insert_id($conn);
+
+            $_SESSION['success'] = "Account created successfully";
+            $_SESSION['username'] = $name;
+            $_SESSION['login_time'] = time();
+        }
+        $stm->close();
+        header("location: dashboard.php");
+        exit;
+    }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,7 +81,10 @@ if (empty($message)) {
 </head>
 
 <body>
-    <?php require_once "includes/header.php" ?>
+    <?php
+    $page = 'register';
+    require_once "includes/header.php";
+    ?>
     <article class="messag">
         <div class="good" id="good"></div>
         <div class="bad" id="bad"></div>
@@ -66,12 +94,6 @@ if (empty($message)) {
         <?php if (!empty($message)): ?>
             <?php foreach ($message as $msg): ?>
                 <div class="php_bad"><?= htmlspecialchars($msg) ?></div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-
-        <?php if (!empty($goodmessage)): ?>
-            <?php foreach ($goodmessage as $gm): ?>
-                <div class="php_good"><?= htmlspecialchars($gm) ?></div>
             <?php endforeach; ?>
         <?php endif; ?>
     </article>
@@ -109,7 +131,7 @@ if (empty($message)) {
                         class="w-full px-4 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                 </div>
 
-                <input type="submit" value="submit"
+                <input type="submit" value="submit" name="createAccount"
                     class="w-full mt-4 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-200 cursor-pointer">
 
             </form>
