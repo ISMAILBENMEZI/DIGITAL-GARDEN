@@ -42,7 +42,7 @@
                 </a>
             </div>
 
-        <?php elseif ($page === 'dashboard'): ?>
+        <?php elseif ($page === 'dashboard' || $page === 'themes'): ?>
             <div class="flex space-x-4">
                 <div class="flex items-center justify-center gap-3">
                     <h4 class="text-2xl font-semibold text-white" style="text-transform: uppercase;">
@@ -59,11 +59,10 @@
                     Accueil
                 </a>
 
-                <a href="includes/auth.php"
+                <a href="includes/auth.php?logout=1"
                     class="px-4 py-2 rounded-md border border-white hover:bg-white hover:text-green-600 transition">
                     Log out
                 </a>
-
             </div>
         <?php endif; ?>
     </nav>
