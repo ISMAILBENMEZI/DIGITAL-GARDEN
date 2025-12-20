@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
         if (mysqli_num_rows($result) > 0) {
             $user = mysqli_fetch_assoc($result);
             if (password_verify($password, $user["password"])) {
+                $_SESSION['userId'] = $user["id"];
                 $_SESSION['username'] = $user["name"];
                 $_SESSION['login_time'] = time();
 
