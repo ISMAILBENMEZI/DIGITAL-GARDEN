@@ -42,7 +42,7 @@
                 </a>
             </div>
 
-        <?php elseif ($page === 'dashboard' || $page === 'themes'): ?>
+        <?php elseif ($page === 'dashboard' || $page === 'themes' || $page === 'notes'): ?>
             <div class="flex space-x-4">
                 <div class="flex items-center justify-center gap-3">
                     <h4 class="text-2xl font-semibold text-white" style="text-transform: uppercase;">

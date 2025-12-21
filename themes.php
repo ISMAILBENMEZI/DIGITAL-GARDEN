@@ -59,11 +59,11 @@
                         style="border-radius: 10px;" />
                 </div>
 
-                <input type="hidden" name="id" value="<?= $_SESSION['updateId'] ?>" />
+                <input type="hidden" name="id" value="<?= $_SESSION['updateId'] ?? '' ?>" />
                 <input
                     type="submit"
-                    value="<?= $_SESSION['Update'] ?? "Submit" ?> "
-                    name="addTheme"
+                    value="<?= isset($_SESSION['updateId']) ? 'Update' : 'Submit' ?> "
+                    name="<?= isset($_SESSION['updateId']) ? 'updateTheme' : 'addTheme' ?>"
                     class=" py-2 w-full mt-4 bg-blue-600 text-white rounded-xl
                        font-medium hover:bg-blue-700 transition cursor-pointer">
             </form>

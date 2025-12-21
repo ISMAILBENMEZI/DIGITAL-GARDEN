@@ -2,13 +2,19 @@
 $page = 'dashboard';
 include "includes/auth.php";
 
-session_start();
 if (!isset($_SESSION['username'])) {
     header("location: includes/auth.php?logout=1");
     exit();
 }
+if (isset($_SESSION['notes'])) {
+    $notes = $_SESSION['notes'];
+    unset($_SESSION['notes']);
+} else {
+    $notes = [];
+}
 
 $themes = affichaeTheTheme($conn);
+
 
 ?>
 <!DOCTYPE html>
@@ -20,6 +26,14 @@ $themes = affichaeTheTheme($conn);
     <title>Document</title>
     <link rel="stylesheet" href="public/output.css">
     <style>
+        main {
+            max-width: 1500px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
         .My_themes {
             background: #fff;
             border-radius: 20px;
@@ -140,6 +154,99 @@ $themes = affichaeTheTheme($conn);
             padding: 7px;
             border-radius: 10px;
         }
+
+        .my_Notes {
+            flex: 2;
+            height: 100%;
+            background: #fff;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            min-width: 280px;
+            max-width: 1000px;
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .my_Notes h2 {
+            color: #58628d;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .my_Notes .notes_list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 10px;
+        }
+
+        .note {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            gap: 10px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .note:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(6, 99, 6, 0.4);
+        }
+
+
+        .note_titleDate {
+            display: flex;
+            justify-content: space-between;
+            color: black;
+            font-weight: 500;
+        }
+
+        .note_titleDate h3 {
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: capitalize;
+        }
+
+        .note_buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .note input[type="submit"][value="modify"],
+        .note input[type="submit"][value="delete"] {
+            background-color: #2563eb;
+            font-size: 16px;
+            color: white;
+            font-weight: 500;
+            padding: 5px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .note input[type="submit"][value="delete"] {
+            background-color: #FF0000;
+        }
+
+        .note input[type="submit"][value="modify"]:hover,
+        .note input[type="submit"][value="delete"]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .note_content p {
+            font-size: 15px;
+            font-weight: 500;
+            color: black;
+        }
     </style>
 </head>
 
@@ -157,22 +264,6 @@ $themes = affichaeTheTheme($conn);
     </article>
 
     <main class="dash_main px-6 py-6">
-        <!-- 
-            <div class="flex justify-center">
-                <div class="modal">
-                    <div class="modal_log">
-                        <h1>Digital Garden</h1>
-                        <div>
-                            Create themes, organize your thoughts, and start building ideas that grow over time. Add notes, connect concepts, and manage your projects in a calm and structured space. Everything you need to stay focused and productive is right here.
-                        </div>
-                    </div>
-                    <div>
-                        <img src="./IMG/Gemini_Generated_Image_69qsfj69qsfj69qs.png" alt="">
-                    </div>
-                </div>
-            </div>
-        -->
-
         <aside class="My_themes">
             <h2>
                 My Theme
@@ -191,9 +282,9 @@ $themes = affichaeTheTheme($conn);
                     <div class="theme" style="background: linear-gradient(135deg, #fff 0%, <?= $theme['Color'] ?> 100%);">
                         <div class="card-body">
                             <h5 class="card-title text-black">Title:<?= $theme['Title'] ?></h5>
-                            <form method="post" action="">
-                                <input name="id" value="<?= $theme['id'] ?>" type="hidden" />
-                                <input value="View Note" name="action" type="submit" />
+                            <form method="post" action="includes/noteAuth.php">
+                                <input name="theme_id" value="<?= $theme['id'] ?>" type="hidden" />
+                                <input value="View Note" name="viewNote" type="submit" />
                             </form>
                         </div>
                         <div class="buttons">
@@ -207,12 +298,68 @@ $themes = affichaeTheTheme($conn);
                                 <input value="delete" name="delete" type="submit" />
                             </form>
 
-                            <div><a href="#?<?= $theme['id'] ?>" class="Add_Note_btn"><img src="IMG/add_14360946.png" alt="" width="20px">Add New Note</a></div>
+                            <div><a href="notes.php?theme_id=<?= $theme['id'] ?>" class="Add_Note_btn"><img src="IMG/add_14360946.png" alt="" width="20px">Add New Note</a></div>
                         </div>
                     </div>
                 <?php endforeach ?>
             </div>
         </aside>
+        <section class="my_Notes">
+            <?php if (empty($themes)): ?>
+
+                <div class="flex justify-center">
+                    <div class="modal">
+                        <div class="modal_log">
+                            <h1>Digital Garden</h1>
+                            <div>
+                                Create themes, organize your thoughts, and start building ideas that grow over time. Add notes, connect concepts, and manage your projects in a calm and structured space. Everything you need to stay focused and productive is right here.
+                            </div>
+                        </div>
+                        <div>
+                            <img src="./IMG/Gemini_Generated_Image_69qsfj69qsfj69qs.png" alt="">
+                        </div>
+                    </div>
+                </div>
+
+            <?php else: ?>
+                <h2>My Notes</h2>
+                <?php if (!empty($notes)): ?>
+                    <div class="notes_list">
+                        <?php foreach ($notes as $note): ?>
+
+                            <div class="note">
+                                <div class="note_titleDate">
+                                    <h3>title:<?= $note['title'] ?></h3>
+                                    <h5><?= $note['creation_date'] ?></h5>
+                                </div>
+                                <div class="note_buttons">
+                                    <form method="POST" action="includes/noteAuth.php">
+                                        <input name="note_id" value="<?= $note['id']?>" type="hidden" />
+                                        <input value="modify" name="modify" type="submit" />
+                                    </form>
+
+                                    <form method="POST" action="includes/noteAuth.php">
+                                        <input name="note_id" value="<?= $note['id'] ?>" type="hidden" />
+                                        <input value="delete" name="delete" type="submit" />
+                                    </form>
+                                    <div class="StarRating">
+                                        <?= $note['importance'] ?>
+                                    </div>
+                                </div>
+                                <div class="note_content">
+                                    <p><?= $note['content'] ?></p>
+                                </div>
+                            </div>
+
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="flex justify-center items-center h-32 bg-gray-100 rounded-lg shadow-md">
+                        <p class="text-gray-500 text-lg font-medium">No Notes present so far!</p>
+                    </div>
+                <?php endif; ?>
+            <?php endif ?>
+        </section>
     </main>
 
 
